@@ -23,10 +23,18 @@ spec:
                   key: DATABASE_URL
           ports:
             - containerPort: 3000
+          volumeMounts:
+            - name: test
+              mountPath: /etc/test
+              readOnly: true
           resources:
             limits:
               memory: "500Mi"
               cpu: "200m"
+      volumes:
+        - name: test
+          configMap:
+            name: demo-config
 
 # DATABASE_URL
 # postgresql://user:password@url:5432/db
