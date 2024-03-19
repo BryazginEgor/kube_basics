@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: postgres
+  template:
+    metadata:
+      labels:
+        components: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16.0
+          env:
+            - name: POSTGRES_USER
+              valueFrom: 
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom: 
+                secretKeyRef:
+                  name: pg-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom: 
+              secretKeyRef:
+                name: pg-secret
+                key: POSTGRES_DB
+          ports:
+            - containerPort: 5432
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "300m"
+          volumeMounts:
+            - name: postgres-data # название volume 
+              mountPath: /var/lib/postgresql/data # куда монтировать volume
+              subPath: postgres # в какую папку помещать в volume данные
+      volumes:
+        - name: postgres-data  # название 
+          persistentVolumeClaim: 
+            claimName: postgres-pvc # название persistentVolumeClaim

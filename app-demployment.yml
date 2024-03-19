@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: short-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: front-end
+  template:
+    metadata:
+      labels:
+        components: front-end   # деплоймент будет контролировать поды, у которых есть метка components со значением front-end
+    spec:
+      containers:
+        - name: short-app
+          image: antonlarichev/short-app:v1.4
+          ports:
+            - containerPort: 80
+          resources:
+            limits:
+              memory: "128Mi"
+              cpu: "100m"

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: short-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      components: back-end
+  template:
+    metadata:
+      labels:
+        components: back-end   # деплоймент будет контролировать поды, у которых есть метка components со значением back-end
+    spec:
+      containers:
+        - name: short-api
+          image: antonlarichev/short-api:v1.0
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: api-secret
+                  key: DATABASE_URL
+          ports:
+            - containerPort: 3000
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "200m"
+
+# DATABASE_URL
+# postgresql://user:password@url:5432/db
+# url тут будет название postgres cluster ip, т.е postgres-clusterip. Внутренний dns kubernetes обеспечит
+# соответствие наименование сервиса его ip
